@@ -1,37 +1,36 @@
-var Quiche = require('quiche');
-
 var colorToHex = {
-    pink   : 'FFC0CB',
-    orange : 'FFA500',
-    yellow : 'FFFF00',
-    purple : '800080',
-    cyan   : '00FFFF',
-    red    : 'FF0000',
-    green  : '008000',
-    blue   : '0000FF',
-    white  : 'F8F8FF'
+    pink   : '#FFC0CB',
+    orange : '#FFA500',
+    yellow : '#FFFF00',
+    purple : '#800080',
+    cyan   : '#00FFFF',
+    red    : '#FF0000',
+    green  : '#008000',
+    blue   : '#0000FF',
+    white  : '#F8F8FF'
 };
 
 exports = module.exports = function(dataGetter) {
     return {
         get : function (request, reply) {
-            dataGetter.getFfaKdrLineGraphData(function (rows) {
-                var chart = new Quiche('line');
-
-                chart.setTitle('KDR over time');
-                chart.setWidth(600);
-                chart.setHeight(500);
-
-                var data  = {};
+            dataGetter.getKdrLineGraphData(function (rows) {
+                var datasets  = {};
                 var dates = [];
 
                 var lastDate = null;
                 rows.forEach(function (row) {
-                    if (! data[row.color]) {
-                        data[row.color] = [];
+                    if (! datasets[row.color]) {
+                        datasets[row.color] = {
+                            label : row.color,
+                            strokeColor : colorToHex[row.color],
+                            pointColor  : colorToHex[row.color],
+                            data        : []
+                        };
                     }
 
-                    data[row.color].push(row.kdr);
+                    datasets[row.color].data.push(row.kdr);
+
+                    // If a new date, push it to dates
                     if (lastDate && lastDate.getTime() !== row.date.getTime()) {
                         var date = new Date(row.date);
                         dates.push((date.getMonth() + 1) + '/' + date.getDate());
@@ -39,14 +38,23 @@ exports = module.exports = function(dataGetter) {
                     lastDate = row.date;
                 });
 
-                for (var color in data) {
-                    chart.addData(data[color], color, colorToHex[color]);
+                // Convert dataset from object to array
+                var datasetArray = [];
+
+                for (var color in datasets) {
+                    datasetArray.push(datasets[color]);
                 }
 
-                chart.addAxisLabels('x', dates);
-                chart.setTransparentBackground();
+                var data = {
+                    labels   : dates,
+                    datasets : datasetArray
+                };
 
-                reply.view('main', {chart : chart.getUrl(true)});
+                var options = {
+                    datasetFill : false
+                };
+
+                reply.view('main', {data : JSON.stringify(data), options : JSON.stringify(options)});
             });
         }
     };

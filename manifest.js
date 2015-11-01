@@ -4,6 +4,7 @@ module.exports = {
     }],
     plugins : {
         'vision': {},
+        'inert' : {},
         '../app-loader' : {
             modules : './src/application'
         }

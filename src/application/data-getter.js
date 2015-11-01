@@ -2,7 +2,7 @@ var knex = require('towerfall-stats').dbKnex;
 
 exports = module.exports = function() {
     return {
-        getFfaKdrLineGraphData : function(callback)
+        getKdrLineGraphData : function(callback)
         {
             knex.select(
                 'color',

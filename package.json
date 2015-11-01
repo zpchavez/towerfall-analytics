@@ -9,13 +9,15 @@
   "author": "Zachary Chavez",
   "license": "ISC",
   "dependencies": {
+    "chart.js": "^1.0.2",
     "electrolyte": "^0.2.0",
     "glue": "^2.4.0",
     "handlebars": "^4.0.3",
+    "inert": "^3.2.0",
     "knex": "^0.8.6",
     "nodemon": "^1.7.3",
-    "quiche": "0.0.10",
     "towerfall-stats": "^0.3.0",
+    "vis": "^4.9.0",
     "vision": "^3.0.0"
   }
 }
