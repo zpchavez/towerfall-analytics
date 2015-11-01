@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Produce graphs from stats collected by towerfall-stats",
   "scripts": {
-    "start": "nodemon -L server.js",
+    "start": "nodemon -L server.js -e js,json,html",
     "config": "node_modules/.bin/tf-stats-db-config"
   },
   "author": "Zachary Chavez",
