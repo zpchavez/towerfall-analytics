@@ -1,5 +1,3 @@
-'use strict';
-
 var ioc = require('electrolyte');
 
 exports.register = function(server, options, next) {
