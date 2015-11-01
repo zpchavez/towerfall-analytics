@@ -7,54 +7,66 @@ var colorToHex = {
     red    : '#FF0000',
     green  : '#008000',
     blue   : '#0000FF',
-    white  : '#F8F8FF'
+    white  : '#FFFFFF'
 };
 
 exports = module.exports = function(dataGetter) {
     return {
         get : function (request, reply) {
             dataGetter.getKdrLineGraphData(function (rows) {
-                var datasets  = {};
-                var dates = [];
+                var kdrs        = {};
+                var dates       = [];
 
-                var lastDate = null;
                 rows.forEach(function (row) {
-                    if (! datasets[row.color]) {
-                        datasets[row.color] = {
-                            label : row.color,
-                            strokeColor : colorToHex[row.color],
-                            pointColor  : colorToHex[row.color],
-                            data        : []
-                        };
+                    var date = new Date(row.date);
+                    var dateLabel = ((date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear());
+
+                    if (! kdrs[dateLabel]) {
+                        kdrs[dateLabel] = {};
                     }
 
-                    datasets[row.color].data.push(row.kdr);
-
-                    // If a new date, push it to dates
-                    if (lastDate && lastDate.getTime() !== row.date.getTime()) {
-                        var date = new Date(row.date);
-                        dates.push((date.getMonth() + 1) + '/' + date.getDate());
-                    }
-                    lastDate = row.date;
+                    kdrs[dateLabel][row.color] = row.kdr;
                 });
 
-                // Convert dataset from object to array
-                var datasetArray = [];
+                var labels      = [];
+                var dataByColor = {};
+                Object.keys(kdrs).forEach(function (date) {
+                    labels.push(date.replace(/\/\d{4}$/, '')); // Remove year to keep label short
 
-                for (var color in datasets) {
-                    datasetArray.push(datasets[color]);
-                }
+                    Object.keys(colorToHex).forEach(function (color) {
+                        if (! dataByColor[color]) {
+                            dataByColor[color] = [];
+                        }
+
+                        dataByColor[color].push(kdrs[date][color] || null);
+                    });
+                });
+
+                var datasets = [];
+
+                Object.keys(dataByColor).forEach(function (color) {
+                    datasets.push({
+                        label       : color,
+                        strokeColor : colorToHex[color],
+                        pointColor  : colorToHex[color],
+                        data        : dataByColor[color]
+                    });
+                });
 
                 var data = {
-                    labels   : dates,
-                    datasets : datasetArray
+                    labels   : labels,
+                    datasets : datasets
                 };
 
                 var options = {
                     datasetFill : false
                 };
 
-                reply.view('main', {data : JSON.stringify(data), options : JSON.stringify(options)});
+                reply.view('line', {
+                    title   : 'KDR Over Time',
+                    data    : JSON.stringify(data),
+                    options : JSON.stringify(options)
+                });
             });
         }
     };
