@@ -59,7 +59,8 @@ exports = module.exports = function(dataGetter) {
                 };
 
                 var options = {
-                    datasetFill : false
+                    datasetFill        : false,
+                    scaleGridLineColor : '#000000'
                 };
 
                 reply.view('line', {
