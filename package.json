@@ -15,6 +15,7 @@
     "handlebars": "^4.0.3",
     "inert": "^3.2.0",
     "knex": "^0.8.6",
+    "mysql": "^2.9.0",
     "nodemon": "^1.7.3",
     "towerfall-stats": "git+https://git@github.com/zpchavez/towerfall-stats.git#c1418a4a6adcf64b21ad4db2ae403eda2aa99817",
     "vis": "^4.9.0",
