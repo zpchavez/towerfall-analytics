@@ -12,7 +12,11 @@ var colorToHex = {
 
 exports = module.exports = function(dataGetter) {
     return {
-        get : function (request, reply) {
+        getMenu : function (request, reply) {
+            reply.view('menu', null, { layout : 'menu-layout'});
+        },
+
+        getKdrOverTime : function (request, reply) {
             dataGetter.getKdrLineGraphData(function (rows) {
                 var kdrs        = {};
                 var dates       = [];

@@ -30,7 +30,12 @@ exports.register = function(server, options, next) {
         {
             method  : 'GET',
             path    : '/',
-            handler : controller.get
+            handler : controller.getMenu
+        },
+        {
+            method  : 'GET',
+            path    : '/kdr-over-time',
+            handler : controller.getKdrOverTime
         }
     ]);
 
