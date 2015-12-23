@@ -43,6 +43,6 @@ exports.register = function(server, options, next) {
 };
 
 exports.register.attributes = {
-    name    : 'griddle',
+    name    : 'towerfall-analytics',
     version : '0.0.0'
 };
