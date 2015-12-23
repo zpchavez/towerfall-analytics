@@ -16,6 +16,40 @@ exports = module.exports = function(dataGetter) {
             reply.view('menu', null, { layout : 'menu-layout'});
         },
 
+        getTeamWinRates : function (request, reply) {
+            dataGetter.getTeamWinRateData(function (results) {
+                var datasets = [];
+
+                results.forEach(function (result) {
+                    var team = result.team;
+
+                    datasets.push({
+                        label       : team,
+                        strokeColor : colorToHex[team.substring(0, team.indexOf('/'))],
+                        fillColor   : colorToHex[team.substring(team.indexOf('/') + 1)],
+                        data        : [result.rate]
+                    });
+                });
+
+                var data = {
+                    labels   : ['Win Rate'],
+                    datasets : datasets
+                };
+
+                var options = {
+                     barStrokeWidth     : 20,
+                     scaleGridLineColor : '#000000',
+                     barDatasetSpacing  : 10
+                };
+
+                reply.view('bar', {
+                    title   : '2v2 Win Rates',
+                    data    : JSON.stringify(data),
+                    options : JSON.stringify(options)
+                });
+            });
+        },
+
         getKdrOverTime : function (request, reply) {
             dataGetter.getKdrLineGraphData(function (rows) {
                 var kdrs        = {};

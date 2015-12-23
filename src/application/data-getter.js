@@ -1,4 +1,5 @@
-var knex = require('towerfall-stats').dbKnex;
+var knex   = require('towerfall-stats').dbKnex;
+var sortby = require('lodash.sortby');
 
 exports = module.exports = function() {
     return {
@@ -15,6 +16,48 @@ exports = module.exports = function() {
             .groupBy('color')
             .orderBy('datetime')
             .then(callback);
+        },
+
+        getTeamWinRateData : function(callback)
+        {
+            var twoVsTwoMatchIdsSubquery = knex
+                .select('match_id')
+                .from('player_match_stats')
+                .groupBy('match_id')
+                .having(knex.raw('SUM(won) > 1 AND SUM(!won) > 1'));
+
+            knex.select(
+                'match_id',
+                knex.raw('GROUP_CONCAT(IF(won, color, null) ORDER BY color SEPARATOR "/") AS winners'),
+                knex.raw('GROUP_CONCAT(IF(!won, color, null) ORDER BY color SEPARATOR "/") AS losers')
+            )
+            .from('player_match_stats')
+            .whereIn('match_id', twoVsTwoMatchIdsSubquery)
+            .groupBy('match_id')
+            .then(function (rows) {
+                var results = {};
+
+                rows.forEach(function (row) {
+                    if (! results[row.winners]) {
+                        results[row.winners] = {wins : 0, matches: 0};
+                    }
+                    if (! results[row.losers]) {
+                        results[row.losers] = {wins : 0, matches: 0};
+                    }
+                    results[row.winners].matches++;
+                    results[row.losers].matches++;
+                    results[row.winners].wins++;
+                });
+
+                var resultsArray = [];
+                for (var team in results) {
+                    results[team].rate = results[team].wins / results[team].matches;
+                    results[team].team = team;
+                    resultsArray.push(results[team]);
+                }
+
+                callback(sortby(resultsArray, function (result) {return result.rate * -1;}));
+            });
         }
     };
 };
