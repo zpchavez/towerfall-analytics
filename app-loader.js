@@ -39,6 +39,11 @@ exports.register = function(server, options, next) {
         },
         {
             method  : 'GET',
+            path    : '/weekly-kdr-over-time',
+            handler : controller.getWeeklyKdrOverTime
+        },
+        {
+            method  : 'GET',
             path    : '/2v2-win-rates',
             handler : controller.getTeamWinRates
         }

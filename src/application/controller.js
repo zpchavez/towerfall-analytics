@@ -10,6 +10,63 @@ var colorToHex = {
     white  : '#FFFFFF'
 };
 
+var makeLineGraph = function (rows, reply, title) {
+    var points = {};
+    var dates  = [];
+
+    rows.forEach(function (row) {
+        var date = new Date(row.date);
+        var dateLabel = ((date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear());
+
+        if (! points[dateLabel]) {
+            points[dateLabel] = {};
+        }
+
+        points[dateLabel][row.color] = row.point;
+    });
+
+    var labels      = [];
+    var dataByColor = {};
+    Object.keys(points).forEach(function (date) {
+        labels.push(date.replace(/\/\d{4}$/, '')); // Remove year to keep label short
+
+        Object.keys(colorToHex).forEach(function (color) {
+            if (! dataByColor[color]) {
+                dataByColor[color] = [];
+            }
+
+            dataByColor[color].push(points[date][color] || null);
+        });
+    });
+
+    var datasets = [];
+
+    Object.keys(dataByColor).forEach(function (color) {
+        datasets.push({
+            label       : color,
+            strokeColor : colorToHex[color],
+            pointColor  : colorToHex[color],
+            data        : dataByColor[color]
+        });
+    });
+
+    var data = {
+        labels   : labels,
+        datasets : datasets
+    };
+
+    var options = {
+        datasetFill        : false,
+        scaleGridLineColor : '#000000'
+    };
+
+    reply.view('line', {
+        title   : title,
+        data    : JSON.stringify(data),
+        options : JSON.stringify(options)
+    });
+};
+
 exports = module.exports = function(dataGetter) {
     return {
         getMenu : function (request, reply) {
@@ -52,60 +109,13 @@ exports = module.exports = function(dataGetter) {
 
         getKdrOverTime : function (request, reply) {
             dataGetter.getKdrLineGraphData(function (rows) {
-                var kdrs        = {};
-                var dates       = [];
+                makeLineGraph(rows, reply, 'KDR Over Time');
+            });
+        },
 
-                rows.forEach(function (row) {
-                    var date = new Date(row.date);
-                    var dateLabel = ((date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear());
-
-                    if (! kdrs[dateLabel]) {
-                        kdrs[dateLabel] = {};
-                    }
-
-                    kdrs[dateLabel][row.color] = row.kdr;
-                });
-
-                var labels      = [];
-                var dataByColor = {};
-                Object.keys(kdrs).forEach(function (date) {
-                    labels.push(date.replace(/\/\d{4}$/, '')); // Remove year to keep label short
-
-                    Object.keys(colorToHex).forEach(function (color) {
-                        if (! dataByColor[color]) {
-                            dataByColor[color] = [];
-                        }
-
-                        dataByColor[color].push(kdrs[date][color] || null);
-                    });
-                });
-
-                var datasets = [];
-
-                Object.keys(dataByColor).forEach(function (color) {
-                    datasets.push({
-                        label       : color,
-                        strokeColor : colorToHex[color],
-                        pointColor  : colorToHex[color],
-                        data        : dataByColor[color]
-                    });
-                });
-
-                var data = {
-                    labels   : labels,
-                    datasets : datasets
-                };
-
-                var options = {
-                    datasetFill        : false,
-                    scaleGridLineColor : '#000000'
-                };
-
-                reply.view('line', {
-                    title   : 'KDR Over Time',
-                    data    : JSON.stringify(data),
-                    options : JSON.stringify(options)
-                });
+        getWeeklyKdrOverTime : function (request, reply) {
+            dataGetter.getWeeklyKdrLineGraphData(function (rows) {
+                makeLineGraph(rows, reply, 'Weekly KDR Over Time');
             });
         }
     };
