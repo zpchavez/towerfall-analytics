@@ -117,6 +117,12 @@ exports = module.exports = function(dataGetter) {
             dataGetter.getWeeklyKdrLineGraphData(function (rows) {
                 makeLineGraph(rows, reply, 'Weekly KDR Over Time');
             });
+        },
+
+        getWeeklyMatchesPlayed : function (request, reply) {
+            dataGetter.getWeeklyMatchesPlayedData(function (rows) {
+                makeLineGraph(rows, reply, 'Weekly Matches Played');
+            });
         }
     };
 };

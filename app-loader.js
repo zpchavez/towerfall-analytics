@@ -44,6 +44,11 @@ exports.register = function(server, options, next) {
         },
         {
             method  : 'GET',
+            path    : '/weekly-matches-played',
+            handler : controller.getWeeklyMatchesPlayed
+        },
+        {
+            method  : 'GET',
             path    : '/2v2-win-rates',
             handler : controller.getTeamWinRates
         }
