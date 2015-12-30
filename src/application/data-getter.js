@@ -3,6 +3,18 @@ var sortby = require('lodash.sortby');
 
 exports = module.exports = function() {
     return {
+        getFreeForAllMatchData : function(callback)
+        {
+            knex.select()
+                .from('matches')
+                .innerJoin('player_match_stats', 'matches.id', 'player_match_stats.match_id')
+                .where({won : 1})
+                .orderBy('datetime')
+                .groupBy('match_id')
+                .havingRaw('SUM(won) = 1')
+                .then(callback);
+        },
+
         getKdrLineGraphData : function(callback)
         {
             knex.select(

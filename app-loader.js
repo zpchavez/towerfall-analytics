@@ -51,6 +51,11 @@ exports.register = function(server, options, next) {
             method  : 'GET',
             path    : '/2v2-win-rates',
             handler : controller.getTeamWinRates
+        },
+        {
+            method  : 'GET',
+            path    : '/ffa-total-streaks',
+            handler : controller.getTotalFreeForAllStreaks
         }
     ]);
 
