@@ -69,6 +69,94 @@ var makeLineGraph = function (rows, reply, title) {
     });
 };
 
+makeStreakBarGraph = function(rows, reply, title) {
+    var previousWinner = null;
+    var streakCount    = 0;
+    var streaks        = {};
+
+    var winners = [];
+    rows.forEach(function (row) {
+        if (winners.indexOf(row.winner) === -1) {
+            winners.push(row.winner);
+        }
+    });
+
+    rows.forEach(function (row, index) {
+        if (previousWinner !== row.winner || (index + 1) === rows.length) {
+            if (streakCount >= MIN_STREAK) {
+                if (typeof streaks[streakCount] === 'undefined') {
+                    streaks[streakCount] = {};
+                    winners.forEach(function (winner) {
+                        streaks[streakCount][winner] = 0;
+                    });
+                }
+                streaks[streakCount][previousWinner] += 1;
+            }
+            streakCount = 1;
+        } else {
+            streakCount += 1;
+        }
+        previousWinner = row.winner;
+    });
+
+    var longestStreak = 0;
+    Object.keys(streaks).forEach(function (index) {
+        if (index > longestStreak) {
+            longestStreak = index;
+        }
+    });
+
+    var labels = [];
+    var winnerData = {};
+    winners.forEach(function (winner) {
+        winnerData[winner] = [];
+    });
+
+    var incrementData = function (winner) {
+        winnerData[winner].push(streaks[streakCount][winner]);
+    };
+    for (streakCount = MIN_STREAK; streakCount <= longestStreak; streakCount += 1) {
+        if (typeof streaks[streakCount] === 'undefined') {
+            continue;
+        }
+
+        labels.push(streakCount);
+        Object.keys(winnerData).forEach(incrementData);
+    }
+
+    var datasets = [];
+    Object.keys(winnerData).forEach(function (winner) {
+        var dataset = getDatasetColors(winner);
+        dataset.data = winnerData[winner];
+        datasets.push(dataset);
+    });
+
+    var data = {
+        labels   : labels,
+        datasets : datasets
+    };
+
+    var options = {
+         barStrokeWidth     : Math.round(400 / (winners.length * Object.keys(streaks).length)),
+         scaleGridLineColor : '#000000'
+    };
+
+    reply.view('bar', {
+        title   :title ,
+        data    : JSON.stringify(data),
+        options : JSON.stringify(options)
+    });
+};
+
+var getDatasetColors = function (colorOrTeam) {
+    var colors = colorOrTeam.split(',');
+
+    return {
+        strokeColor    : colorToHex[colors[0]],
+        fillColor      : colors.length > 1 ? colorToHex[colors[1]] : colorToHex[colors[0]]
+    };
+};
+
 exports = module.exports = function(dataGetter) {
     return {
         getMenu : function (request, reply) {
@@ -96,7 +184,7 @@ exports = module.exports = function(dataGetter) {
                 };
 
                 var options = {
-                     barStrokeWidth     : 20,
+                     barStrokeWidth     : Math.round(400 / datasets.length),
                      scaleGridLineColor : '#000000',
                      barDatasetSpacing  : 10
                 };
@@ -133,90 +221,15 @@ exports = module.exports = function(dataGetter) {
             });
         },
 
+        getTotal2v2Streaks : function (request, reply) {
+            dataGetter.get2v2MatchData(function (rows) {
+                makeStreakBarGraph(rows, reply, 'Total Winning Streaks (2v2)');
+            });
+        },
+
         getTotalFreeForAllStreaks : function (request, reply) {
             dataGetter.getFreeForAllMatchData(function (rows) {
-                var previousWinner = null;
-                var streakCount    = 0;
-                var streaks        = {};
-                rows.forEach(function (row, index) {
-                    if (previousWinner !== row.color || (index + 1) === rows.length) {
-                        if (streakCount >= MIN_STREAK) {
-                            if (typeof streaks[streakCount] === 'undefined') {
-                                streaks[streakCount] = {
-                                    pink   : 0,
-                                    orange : 0,
-                                    yellow : 0,
-                                    purple : 0,
-                                    cyan   : 0,
-                                    red    : 0,
-                                    green  : 0,
-                                    blue   : 0,
-                                    white  : 0
-                                };
-                            }
-                            streaks[streakCount][previousWinner] += 1;
-                        }
-                        streakCount = 1;
-                    } else {
-                        streakCount += 1;
-                    }
-                    previousWinner = row.color;
-                });
-
-                var longestStreak = 0;
-                Object.keys(streaks).forEach(function (index) {
-                    if (index > longestStreak) {
-                        longestStreak = index;
-                    }
-                });
-
-                var labels = [];
-                var colorData = {
-                    pink   : [],
-                    orange : [],
-                    yellow : [],
-                    purple : [],
-                    cyan   : [],
-                    red    : [],
-                    green  : [],
-                    blue   : [],
-                    white  : []
-                };
-                var incrementData = function (color) {
-                    colorData[color].push(streaks[streakCount][color]);
-                };
-                for (streakCount = MIN_STREAK; streakCount <= longestStreak; streakCount += 1) {
-                    if (typeof streaks[streakCount] === 'undefined') {
-                        continue;
-                    }
-
-                    labels.push(streakCount);
-                    Object.keys(colorData).forEach(incrementData);
-                }
-
-                var datasets = [];
-                Object.keys(colorData).forEach(function (color) {
-                    datasets.push({
-                        strokeColor : colorToHex[color],
-                        fillColor   : colorToHex[color],
-                        data        : colorData[color]
-                    });
-                });
-
-                var data = {
-                    labels   : labels,
-                    datasets : datasets
-                };
-
-                var options = {
-                     scaleGridLineColor : '#000000'
-                };
-
-                reply.view('bar', {
-                    title   : 'Total Winning Streaks (Free For All)',
-                    data    : JSON.stringify(data),
-                    options : JSON.stringify(options)
-                });
+                makeStreakBarGraph(rows, reply, 'Total Winning Streaks (Free For All)');
             });
         }
     };

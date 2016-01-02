@@ -61,6 +61,11 @@ exports.register = function(server, options, next) {
             method  : 'GET',
             path    : '/ffa-total-streaks',
             handler : controller.getTotalFreeForAllStreaks
+        },
+        {
+            method  : 'GET',
+            path    : '/2v2-total-streaks',
+            handler : controller.getTotal2v2Streaks
         }
     ]);
 

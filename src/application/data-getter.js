@@ -5,13 +5,27 @@ exports = module.exports = function() {
     return {
         getFreeForAllMatchData : function(callback)
         {
-            knex.select()
+            knex.select(knex.raw('color AS winner'))
                 .from('matches')
                 .innerJoin('player_match_stats', 'matches.id', 'player_match_stats.match_id')
                 .where({won : 1})
                 .orderBy('datetime')
                 .groupBy('match_id')
                 .havingRaw('SUM(won) = 1')
+                .then(callback);
+        },
+
+        get2v2MatchData : function(callback)
+        {
+            knex.select(
+                    knex.raw('GROUP_CONCAT(IF(won = 1, color, null) ORDER BY color) as winner'),
+                    knex.raw('GROUP_CONCAT(IF(won = 0, color, null) ORDER BY color) as loser')
+                )
+                .from('matches')
+                .innerJoin('player_match_stats', 'matches.id', 'player_match_stats.match_id')
+                .orderBy('datetime')
+                .groupBy('match_id')
+                .havingRaw('SUM(won) = 2')
                 .then(callback);
         },
 
