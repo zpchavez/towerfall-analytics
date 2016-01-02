@@ -54,8 +54,8 @@ exports.register = function(server, options, next) {
         },
         {
             method  : 'GET',
-            path    : '/2v2-win-rates',
-            handler : controller.getTeamWinRates
+            path    : '/total-2v2-win-rates',
+            handler : controller.getTotalTeamWinRates
         },
         {
             method  : 'GET',

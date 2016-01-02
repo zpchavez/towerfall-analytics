@@ -163,7 +163,7 @@ exports = module.exports = function(dataGetter) {
             reply.view('menu', null, { layout : 'menu-layout'});
         },
 
-        getTeamWinRates : function (request, reply) {
+        getTotalTeamWinRates : function (request, reply) {
             dataGetter.getTeamWinRateData(function (results) {
                 var datasets = [];
 
@@ -190,7 +190,7 @@ exports = module.exports = function(dataGetter) {
                 };
 
                 reply.view('bar', {
-                    title   : '2v2 Win Rates',
+                    title   : 'Total 2v2 Win Rates',
                     data    : JSON.stringify(data),
                     options : JSON.stringify(options)
                 });
