@@ -15,7 +15,7 @@ exports = module.exports = function() {
                 .then(callback);
         },
 
-        getKdrLineGraphData : function(callback)
+        getDailyKdrData : function(callback)
         {
             knex.select(
                 'color',
@@ -30,7 +30,7 @@ exports = module.exports = function() {
             .then(callback);
         },
 
-        getWeeklyKdrLineGraphData : function(callback)
+        getWeeklyKdrData : function(callback)
         {
             knex.select(
                 'color',
@@ -45,7 +45,7 @@ exports = module.exports = function() {
             .then(callback);
         },
 
-        getWeeklyWinRateLineGraphData : function(callback)
+        getWeeklyWinRateData : function(callback)
         {
             knex.select(
                 'color',

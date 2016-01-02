@@ -34,13 +34,13 @@ exports.register = function(server, options, next) {
         },
         {
             method  : 'GET',
-            path    : '/kdr-over-time',
-            handler : controller.getKdrOverTime
+            path    : '/daily-kdr',
+            handler : controller.getDailyKdr
         },
         {
             method  : 'GET',
-            path    : '/weekly-kdr-over-time',
-            handler : controller.getWeeklyKdrOverTime
+            path    : '/weekly-kdr',
+            handler : controller.getWeeklyKdr
         },
         {
             method  : 'GET',

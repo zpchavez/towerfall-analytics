@@ -109,20 +109,20 @@ exports = module.exports = function(dataGetter) {
             });
         },
 
-        getKdrOverTime : function (request, reply) {
-            dataGetter.getKdrLineGraphData(function (rows) {
+        getDailyKdr : function (request, reply) {
+            dataGetter.getDailyKdrData(function (rows) {
                 makeLineGraph(rows, reply, 'KDR Over Time');
             });
         },
 
-        getWeeklyKdrOverTime : function (request, reply) {
-            dataGetter.getWeeklyKdrLineGraphData(function (rows) {
+        getWeeklyKdr : function (request, reply) {
+            dataGetter.getWeeklyKdrData(function (rows) {
                 makeLineGraph(rows, reply, 'Weekly KDR Over Time');
             });
         },
 
         getWeeklyWinRate : function (request, reply) {
-            dataGetter.getWeeklyWinRateLineGraphData(function (rows) {
+            dataGetter.getWeeklyWinRateData(function (rows) {
                 makeLineGraph(rows, reply, 'Weekly Win Rate');
             });
         },
