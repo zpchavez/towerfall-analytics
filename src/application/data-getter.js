@@ -45,6 +45,21 @@ exports = module.exports = function() {
             .then(callback);
         },
 
+        getWeeklyWinRateLineGraphData : function(callback)
+        {
+            knex.select(
+                'color',
+                knex.raw('SUM(won) / COUNT(*) AS point'),
+                knex.raw("STR_TO_DATE(CONCAT(YEAR(datetime),WEEK(datetime),' Monday'), '%X%V %W') AS date")
+            )
+            .from('matches')
+            .innerJoin('player_match_stats', 'matches.id', 'player_match_stats.match_id')
+            .groupBy(knex.raw('WEEK(datetime)'))
+            .groupBy('color')
+            .orderBy(knex.raw('WEEK(`datetime`)'))
+            .then(callback);
+        },
+
         getWeeklyMatchesPlayedData : function(callback)
         {
             knex.select(

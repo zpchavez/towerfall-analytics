@@ -121,6 +121,12 @@ exports = module.exports = function(dataGetter) {
             });
         },
 
+        getWeeklyWinRate : function (request, reply) {
+            dataGetter.getWeeklyWinRateLineGraphData(function (rows) {
+                makeLineGraph(rows, reply, 'Weekly Win Rate');
+            });
+        },
+
         getWeeklyMatchesPlayed : function (request, reply) {
             dataGetter.getWeeklyMatchesPlayedData(function (rows) {
                 makeLineGraph(rows, reply, 'Weekly Matches Played');
