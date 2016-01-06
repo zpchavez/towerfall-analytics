@@ -74,6 +74,22 @@ exports = module.exports = function() {
             .then(callback);
         },
 
+        getWeeklySurvivalRateData : function(callback)
+        {
+            knex.select(
+                'color',
+                knex.raw('(SUM(rounds) - SUM(deaths)) / SUM(rounds) AS point'),
+                knex.raw("STR_TO_DATE(CONCAT(YEAR(datetime),WEEK(datetime),' Monday'), '%X%V %W') AS date")
+            )
+            .from('matches')
+            .innerJoin('player_match_stats', 'matches.id', 'player_match_stats.match_id')
+            .groupBy(knex.raw('CONCAT(YEAR(datetime),WEEK(datetime))'))
+            .groupBy('color')
+            .whereIn('match_id', this._getFreeForAllMatchIdsSubquery())
+            .orderBy('datetime')
+            .then(callback);
+        },
+
         getWeeklyMatchesPlayedData : function(callback)
         {
             knex.select(
@@ -91,19 +107,13 @@ exports = module.exports = function() {
 
         getTeamWinRateData : function(callback)
         {
-            var twoVsTwoMatchIdsSubquery = knex
-                .select('match_id')
-                .from('player_match_stats')
-                .groupBy('match_id')
-                .having(knex.raw('SUM(won) > 1 AND SUM(!won) > 1'));
-
             knex.select(
                 'match_id',
                 knex.raw('GROUP_CONCAT(IF(won, color, null) ORDER BY color SEPARATOR "/") AS winners'),
                 knex.raw('GROUP_CONCAT(IF(!won, color, null) ORDER BY color SEPARATOR "/") AS losers')
             )
             .from('player_match_stats')
-            .whereIn('match_id', twoVsTwoMatchIdsSubquery)
+            .whereIn('match_id', this._get2v2MatchIdsSubquery())
             .groupBy('match_id')
             .then(function (rows) {
                 var results = {};
@@ -129,6 +139,24 @@ exports = module.exports = function() {
 
                 callback(sortby(resultsArray, function (result) {return result.rate * -1;}));
             });
+        },
+
+        _get2v2MatchIdsSubquery : function()
+        {
+            return knex
+                .select('match_id')
+                .from('player_match_stats')
+                .groupBy('match_id')
+                .having(knex.raw('SUM(won) = 2 AND SUM(!won) = 2'));
+        },
+
+        _getFreeForAllMatchIdsSubquery : function()
+        {
+            return knex
+                .select('match_id')
+                .from('player_match_stats')
+                .groupBy('match_id')
+                .having(knex.raw('SUM(won) = 1'));
         }
     };
 };

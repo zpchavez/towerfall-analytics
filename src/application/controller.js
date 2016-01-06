@@ -221,6 +221,12 @@ exports = module.exports = function(dataGetter) {
             });
         },
 
+        getWeeklySurvivalRate : function (request, reply) {
+            dataGetter.getWeeklySurvivalRateData(function (rows) {
+                makeLineGraph(rows, reply, 'Weekly Survival Rate (Free For All)');
+            });
+        },
+
         getTotal2v2Streaks : function (request, reply) {
             dataGetter.get2v2MatchData(function (rows) {
                 makeStreakBarGraph(rows, reply, 'Total Winning Streaks (2v2)');
