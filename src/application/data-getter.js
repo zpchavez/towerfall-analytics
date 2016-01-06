@@ -53,9 +53,9 @@ exports = module.exports = function() {
             )
             .from('matches')
             .innerJoin('player_match_stats', 'matches.id', 'player_match_stats.match_id')
-            .groupBy(knex.raw('WEEK(datetime)'))
+            .groupBy(knex.raw('CONCAT(YEAR(datetime),WEEK(datetime))'))
             .groupBy('color')
-            .orderBy(knex.raw('WEEK(`datetime`)'))
+            .orderBy('datetime')
             .then(callback);
         },
 
@@ -68,9 +68,9 @@ exports = module.exports = function() {
             )
             .from('matches')
             .innerJoin('player_match_stats', 'matches.id', 'player_match_stats.match_id')
-            .groupBy(knex.raw('WEEK(datetime)'))
+            .groupBy(knex.raw('CONCAT(YEAR(datetime),WEEK(datetime))'))
             .groupBy('color')
-            .orderBy(knex.raw('WEEK(`datetime`)'))
+            .orderBy('datetime')
             .then(callback);
         },
 
@@ -83,9 +83,9 @@ exports = module.exports = function() {
             )
             .from('matches')
             .innerJoin('player_match_stats', 'matches.id', 'player_match_stats.match_id')
-            .groupBy(knex.raw('WEEK(datetime)'))
+            .groupBy(knex.raw('CONCAT(YEAR(datetime),WEEK(datetime))'))
             .groupBy('color')
-            .orderBy(knex.raw('WEEK(`datetime`)'))
+            .orderBy('datetime')
             .then(callback);
         },
 
